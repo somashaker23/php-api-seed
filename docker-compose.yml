@@ -1,0 +1,45 @@
+  services:
+    app:
+      image: php:8.0-fpm
+      container_name: php-seed-app
+      volumes:
+        - ./src:/var/www/html
+      working_dir: /var/www/html
+      networks:
+        - app-network
+      ports:
+        - "8080:80"
+      depends_on:
+        - db
+      command: "php -S 0.0.0.0:80 -t public"
+
+    db:
+      image: mysql:5.7
+      container_name: mysql-db
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpassword
+        MYSQL_DATABASE: appdb
+      volumes:
+        - db-data:/var/lib/mysql
+      networks:
+        - app-network
+
+    phpmyadmin:
+      image: phpmyadmin:5
+      container_name: phpmyadmin
+      environment:
+        PMA_HOST: db
+        PMA_PORT: 3306
+      ports:
+        - "3000:80"
+      networks:
+        - app-network
+      depends_on:
+        - db
+
+  networks:
+    app-network:
+      driver: bridge
+
+  volumes:
+    db-data:
